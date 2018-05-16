@@ -152,5 +152,21 @@ Q13
 """
 Q14
 """
+# value=cal_state_val(Reward(max_lamda, 1),P,Df,eps)
+# plot_map(value,0)
 
+"""
+Q15
+"""
+#Compare the heat maps of Question 3 and Question 14
 
+"""
+Q16
+"""
+po=cal_optimal_policy(value)
+plot_map(po,1)
+
+"""
+Q17
+"""
+#Compare the figures of Question 5 and Question 16
