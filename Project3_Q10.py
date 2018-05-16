@@ -62,6 +62,8 @@ def Reward(lamda, Rmax):
     # P_long = np.vstack(P_long)
     # print len(P_long)
 
+    #This part is from https://github.com/MatthewJA/Inverse-Reinforcement-Learning/blob/master/irl/linear_irl.py
+    ##not sure how to write 
     def T(a, s):
             opti_policy = int(pi1[s%10, s//10])
             return np.dot(P[opti_policy, s, :] - P[a, s, :], np.linalg.inv(I-0.8*P[opti_policy, s, :]))
@@ -77,6 +79,8 @@ def Reward(lamda, Rmax):
             for s in range(100)
             for a in Actions - {int(pi1[s%10, s//10])}
     ])
+
+    ####
 
     # print I2.size
 
