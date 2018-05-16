@@ -119,12 +119,56 @@ def init_R():
 
     return R1,R2
 
+def compute_pi(P, R, r, e):
+    V = np.zeros((10,10))
+    Pi = np.zeros((10,10))
+    delta = 2*e
+    while delta > e:
+        delta = 0
+        for i in range(10):
+            for j in range(10):
+                v = V[i,j]
+                A = np.zeros(4)
+                for k in range(4):
+                    if (i,j) not in ((0,0),(0,9),(9,0),(9,9)):
+                        A[k] = P[k,j*10+i,j*10+max(i-1,0)]*(R[max(i-1,0),j]+r*V[max(i-1,0),j])+\
+                            P[k,j*10+i,j*10+min(i+1,9)]*(R[min(i+1,9),j]+r*V[min(i+1,9),j])+\
+                            P[k,j*10+i,max(j-1,0)*10+i]*(R[i,max(j-1,0)]+r*V[i,max(j-1,0)])+\
+                            P[k,j*10+i,min(j+1,9)*10+i]*(R[i,min(j+1,9)]+r*V[i,min(j+1,9)])
+                    else:
+                        A[k] = P[k,j*10+i,j*10+i]*(R[i,j]+r*V[i,j])
+                        if i==0 and j==0: A[k] += P[k,j*10+i,j*10+i+1]*(R[i+1,j]+r*V[i+1,j]) + P[k,j*10+i,(j+1)*10+i]*(R[i,j+1]+r*V[i,j+1])
+                        elif i==9 and j==0: A[k] += P[k,j*10+i,j*10+i-1]*(R[i-1,j]+r*V[i-1,j]) + P[k,j*10+i,(j+1)*10+i]*(R[i,j+1]+r*V[i,j+1])
+                        elif i==0 and j==9: A[k] += P[k,j*10+i,j*10+i+1]*(R[i+1,j]+r*V[i+1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
+                        elif i==9 and j==9: A[k] += P[k,j*10+i,j*10+i-1]*(R[i-1,j]+r*V[i-1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
+                V[i,j] = np.amax(A)
+                delta = max(delta,abs(v-V[i,j]))
+    for i in range(10):
+        for j in range(10):
+            A = np.zeros(4)
+            for k in range(4):
+                if (i,j) not in ((0,0),(0,9),(9,0),(9,9)):
+                    A[k] = P[k,j*10+i,j*10+max(i-1,0)]*(R[max(i-1,0),j]+r*V[max(i-1,0),j])+\
+                        P[k,j*10+i,j*10+min(i+1,9)]*(R[min(i+1,9),j]+r*V[min(i+1,9),j])+\
+                        P[k,j*10+i,max(j-1,0)*10+i]*(R[i,max(j-1,0)]+r*V[i,max(j-1,0)])+\
+                        P[k,j*10+i,min(j+1,9)*10+i]*(R[i,min(j+1,9)]+r*V[i,min(j+1,9)])
+                else:
+                    A[k] = P[k,j*10+i,j*10+i]*(R[i,j]+r*V[i,j])
+                    if i==0 and j==0: A[k] += P[k,j*10+i,j*10+i+1]*(R[i+1,j]+r*V[i+1,j]) + P[k,j*10+i,(j+1)*10+i]*(R[i,j+1]+r*V[i,j+1])
+                    elif i==9 and j==0: A[k] += P[k,j*10+i,j*10+i-1]*(R[i-1,j]+r*V[i-1,j]) + P[k,j*10+i,(j+1)*10+i]*(R[i,j+1]+r*V[i,j+1])
+                    elif i==0 and j==9: A[k] += P[k,j*10+i,j*10+i+1]*(R[i+1,j]+r*V[i+1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
+                    elif i==9 and j==9: A[k] += P[k,j*10+i,j*10+i-1]*(R[i-1,j]+r*V[i-1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
+            Pi[i,j] = np.argmax(A)
+    return Pi
 ######################
 # Main function
 ######################
 def main():
-    print("hello world")
+    w = 0.1
+    r = 0.8
+    e = 0.01
+    P = init_P(w)
     R1, R2 = init_R()
-    print(R2)
+    Pi_1 = compute_pi(P,R1,r,e)
 if __name__ == "__main__":
     main()
