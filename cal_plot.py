@@ -24,6 +24,7 @@ def plot_map(V,policy):
             for y in np.arange(0,V.shape[1],1):
                 plt.gca().text(y+0.5,x+0.5,format(V[x, y], '.1f'),horizontalalignment="center")
     else:
+        plt.grid(True)
         arrow = [u'\u2191', u'\u2193', u'\u2190', u'\u2192']
         for x in np.arange(0,V.shape[0],1):
             for y in np.arange(0,V.shape[1],1):
@@ -55,24 +56,35 @@ def cal_state_val(R,P,Df,eps):
                 delta = max(delta, abs(v-V[i,j]))
     return V
 
-def cal_optimal_policy(V):
+def cal_optimal_policy(V,R,P,Df):
     pi=np.zeros((10,10))
     for i in range(0,10):
         for j in range(0,10):
-            temp = V[i,j]
-            if temp <= V[max((i-1),0),j]:
-                temp =  V[max((i-1),0),j]
+            candidate = np.zeros(4)
+            for k in range(4):
+                if (i,j) not in ((0,0),(0,9),(9,0),(9,9)):
+                    candidate[k] += P[k,j*10+i,j*10+max((i-1),0)]*(R[max((i-1),0),j]+Df*V[max((i-1),0),j]) +\
+                                    P[k,j*10+i,j*10+min((i+1),9)]*(R[min((i+1),9),j]+Df*V[min((i+1),9),j]) +\
+                                    P[k,j*10+i,max((j-1),0)*10+i]*(R[i,max((j-1),0)]+Df*V[i,max((j-1),0)]) +\
+                                    P[k,j*10+i,min((j+1),9)*10+i]*(R[i,min((j+1),9)]+Df*V[i,min((j+1),9)])
+                else:
+                    candidate[k] += P[k,j*10+i,j*10+i]*(R[i,j]+Df*V[i,j])
+                    if i==0 and j==0: candidate[k] += P[k,j*10+i,j*10+(i+1)]*(R[i+1,j]+Df*V[i+1,j]) + P[k,j*10+i,(j+1)*10+i]*(R[i,j+1]+Df*V[i,j+1])
+                    elif i==0 and j==9: candidate[k] += P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+Df*V[i,j-1]) + P[k,j*10+i,j*10+(i+1)]*(R[i+1,j]+Df*V[i+1,j])
+                    elif i==9 and j==0: candidate[k] += P[k,j*10+i,j*10+(i-1)]*(R[i-1,j]+Df*V[i-1,j]) + P[k,j*10+i,(j+1)*10+i]*(R[i,j+1]+Df*V[i,j+1])
+                    elif i==9 and j==9: candidate[k] += P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+Df*V[i,j-1]) + P[k,j*10+i,j*10+(i-1)]*(R[i-1,j]+Df*V[i-1,j])      
+            best = np.amax(candidate)
+            if best == candidate[0]:
                 pi[i,j] = 0
-            if temp <= V[min((i+1),9),j]:
-                temp =  V[min((i+1),9),j]
+            if best == candidate[1]:
                 pi[i,j] = 1
-            if temp <= V[i,max((j-1),0)]:
-                temp =  V[i,max((j-1),0)]
+            if best == candidate[2]:
                 pi[i,j] = 2
-            if temp <= V[i,min((j+1),9)]:
-                temp =  V[i,min((j+1),9)]
+            if best == candidate[3]:
                 pi[i,j] = 3
     return pi
+ 
+    
 
 def ini_P_matrix():
     P=np.zeros((4,100,100))
@@ -187,7 +199,6 @@ def ini_R_matrix():
 Df = 0.8
 eps = 0.01
 w = 0.1
-
 # P=ini_P_matrix()
 # R1, R2 = ini_R_matrix()
 
