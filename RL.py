@@ -123,7 +123,7 @@ def init_R():
 # Main function
 ######################
 def main():
-    print("hello")
+    print("hello world")
     R1, R2 = init_R()
     print(R2)
 if __name__ == "__main__":
