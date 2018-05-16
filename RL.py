@@ -159,6 +159,8 @@ def compute_pi(P, R, r, e):
                     elif i==0 and j==9: A[k] += P[k,j*10+i,j*10+i+1]*(R[i+1,j]+r*V[i+1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
                     elif i==9 and j==9: A[k] += P[k,j*10+i,j*10+i-1]*(R[i-1,j]+r*V[i-1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
             Pi[i,j] = np.argmax(A)
+    print(Pi)
+         
     return Pi
 ######################
 # Main function
@@ -169,6 +171,9 @@ def main():
     e = 0.01
     P = init_P(w)
     R1, R2 = init_R()
-    Pi_1 = compute_pi(P,R1,r,e)
+    print("Reward graph:")
+    print(R2)
+    print("Policy graph:")
+    compute_pi(P,R2,r,e)
 if __name__ == "__main__":
     main()
