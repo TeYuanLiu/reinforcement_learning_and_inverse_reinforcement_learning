@@ -30,8 +30,8 @@ V2=cal_state_val(R2,P,Df,eps)
 # plot_map(V1,0)
 # plot_map(V2,0)
 
-pi1=cal_optimal_policy(V1)
-pi2=cal_optimal_policy(V2)
+pi1=cal_optimal_policy(V1,R1,P,Df)
+pi2=cal_optimal_policy(V2,R2,P,Df)
 
 
 # plot_map(pi1,1)
@@ -104,7 +104,7 @@ def Reward(lamda, Rmax):
 
     sol = solvers.lp(c, A, b)
 
-    # R_new = np.reshape(sol['x'][:100], (10,10))
+    #R_new = np.reshape(sol['x'][:100], (10,10))
     R_new = sol['x'][:100]
     R_new_10x10 = np.zeros((10,10))
     count = 0
@@ -117,14 +117,14 @@ def Reward(lamda, Rmax):
 
 def Acc(R):
     V_inv = cal_state_val(R,P,Df,eps)
-    poli_inv = cal_optimal_policy(V_inv)
+    poli_inv = cal_optimal_policy(V_inv, R, P, Df)
     # plot_map(poli_inv, 1)
     return np.sum(poli_inv == pi1)/100.0
 
 """
 Q11
 """
-lamdas = np.arange(0.0, 5.01, 1)
+lamdas = np.arange(0.0, 5.01, 1) ## 1 should be changed to 0.01
 accs = []
 
 
@@ -145,15 +145,15 @@ print max_lamda
 Q13
 """
 #ground truth
-# plot_map(R1,0)
+plot_map(R1,0)
 #extracted reward
-# plot_map(Reward(max_lamda, 1),0)
+plot_map(Reward(max_lamda, 1),0)
 
 """
 Q14
 """
-# value=cal_state_val(Reward(max_lamda, 1),P,Df,eps)
-# plot_map(value,0)
+value=cal_state_val(Reward(max_lamda, 1),P,Df,eps)
+plot_map(value,0)
 
 """
 Q15
@@ -163,7 +163,7 @@ Q15
 """
 Q16
 """
-po=cal_optimal_policy(value)
+po=cal_optimal_policy(value, Reward(max_lamda, 1), P, Df)
 plot_map(po,1)
 
 """
