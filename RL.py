@@ -170,11 +170,15 @@ def plot_map(V, heat_flag):
     plt.figure()
     plt.gca().invert_yaxis()
     plt.gca().xaxis.tick_top()
-    plt.xticks(np.arange(V.shape[0]))
-    plt.yticks(np.arange(V.shape[1]))
     if heat_flag:
+        plt.xticks(np.arange(V.shape[0]))
+        plt.yticks(np.arange(V.shape[1]))
         plt.pcolor(V)
         plt.colorbar()
+    else:
+        plt.xticks(np.arange(V.shape[0]+1))
+        plt.yticks(np.arange(V.shape[1]+1))
+
     for x in np.arange(V.shape[0]):
         for y in np.arange(V.shape[1]):
             plt.gca().text(y+0.5,x+0.5,format(V[x,y], '.1f'),horizontalalignment="center")
