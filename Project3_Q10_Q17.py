@@ -69,26 +69,26 @@ def Reward(lamda, Rmax):
             return np.dot(P[opti_policy, s, :] - P[a, s, :], np.linalg.inv(I-0.8*P[opti_policy, s, :]))
 
     Z2 = np.zeros((100*(4-1), 100)) #300*100
-    P_long = np.vstack([
-            -T(a, s)
-            for s in range(100)
-            for a in Actions - {int(pi1[s%10, s//10])}
-        ])
-    I2 = np.vstack([
-            np.eye(1, 100, s)
-            for s in range(100)
-            for a in Actions - {int(pi1[s%10, s//10])}
-    ])
+    P_long = np.zeros((100*(4-1), 100)) #*100
+    count = 0
+    for s in range(100):
+    	for a in Actions - {int(pi1[s%10, s//10])}:
+    		P_long[count,:] = -T(a,s)
+    		count+=1
+
+    I2 = np.zeros((100*(4-1), 100)) #*100
+    count = 0
+    for s in range(100):
+    	for a in Actions - {int(pi1[s%10, s//10])}:
+    		I2[count,:] = np.eye(1, 100, s)
+    		count+=1
 
     ####
-
-    # print I2.size
 
     R_para = np.vstack([P_long, P_long, -I, I, I, -I])
     ti_para = np.vstack([I2, Z2, Z, Z, Z, Z])
     u_para = np.vstack([Z2, Z2, -I, -I, Z, Z])
 
-    # print R_para.size
     # print ti_para.size
     # print u_para.size
 
@@ -102,7 +102,7 @@ def Reward(lamda, Rmax):
     # print c.size
 
 
-    sol = solvers.lp(c, A, b)
+    sol = solvers.lp(c, A, b);
 
     #R_new = np.reshape(sol['x'][:100], (10,10))
     R_new = sol['x'][:100]
@@ -124,7 +124,7 @@ def Acc(R):
 """
 Q11
 """
-lamdas = np.arange(0.0, 5.01, 1) ## 1 should be changed to 0.01
+lamdas = np.arange(0.0, 5.01, 0.01) ## 1 should be changed to 0.01
 accs = []
 
 
