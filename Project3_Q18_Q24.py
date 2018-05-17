@@ -126,7 +126,7 @@ Q11
 """
 
 rmax = 100
-lamdas = np.linspace(0.0, 5.0, num=5, endpoint=True) ## 1 should be changed to 0.01
+lamdas = np.linspace(0.0, 5.0, num=10, endpoint=True) ## 5 should be changed to 500
 accs = []
 
 

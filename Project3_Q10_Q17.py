@@ -124,12 +124,12 @@ def Acc(R):
 """
 Q11
 """
-lamdas = np.linspace(0.0, 5.0, num=5, endpoint=True) ## 1 should be changed to 0.01
+rmax = 1
+lamdas = np.linspace(0.0, 5.0, num=5, endpoint=True) ## 5 should be changed to 500
 accs = []
 
-
 for lamda in lamdas:
-    accs.append(Acc(Reward(lamda, 1)))
+    accs.append(Acc(Reward(lamda, rmax)))
 
 # print accs
 plt.plot(lamdas, accs)
@@ -147,12 +147,12 @@ Q13
 #ground truth
 plot_map(R1,0)
 #extracted reward
-plot_map(Reward(max_lamda, 1),0)
+plot_map(Reward(max_lamda, rmax),0)
 
 """
 Q14
 """
-value=cal_state_val(Reward(max_lamda, 1),P,Df,eps)
+value=cal_state_val(Reward(max_lamda, rmax),P,Df,eps)
 plot_map(value,0)
 
 """
@@ -163,7 +163,7 @@ Q15
 """
 Q16
 """
-po=cal_optimal_policy(value, Reward(max_lamda, 1), P, Df)
+po=cal_optimal_policy(value, Reward(max_lamda, rmax), P, Df)
 plot_map(po,1)
 
 """
