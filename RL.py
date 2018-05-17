@@ -1,3 +1,6 @@
+## -*- coding: utf-8 -*-
+
+
 ######################
 # Author: Te-Yuan Liu
 ######################
@@ -5,8 +8,9 @@
 ######################
 # Import library
 ######################
-import numpy as np
 
+import numpy as np
+import matplotlib.pyplot as plt
 ######################
 # Define function
 ######################
@@ -160,7 +164,45 @@ def compute_pi(P, R, r, e):
                     elif i==9 and j==9: A[k] += P[k,j*10+i,j*10+i-1]*(R[i-1,j]+r*V[i-1,j]) + P[k,j*10+i,(j-1)*10+i]*(R[i,j-1]+r*V[i,j-1])
             Pi[i,j] = np.argmax(A)
 
-    return Pi
+    return V, Pi
+
+def plot_map(V, heat_flag):
+    plt.figure()
+    plt.gca().invert_yaxis()
+    plt.gca().xaxis.tick_top()
+    if heat_flag:
+        plt.xticks(np.arange(V.shape[0]))
+        plt.yticks(np.arange(V.shape[1]))
+        plt.pcolor(V)
+        plt.colorbar()
+    else:
+        plt.xticks(np.arange(V.shape[0]+1))
+        plt.yticks(np.arange(V.shape[1]+1))
+
+    for x in np.arange(V.shape[0]):
+        for y in np.arange(V.shape[1]):
+            plt.gca().text(y+0.5,x+0.5,format(V[x,y], '.1f'),horizontalalignment="center")
+    plt.show()
+
+def plot_action(Pi):
+    plt.figure()
+    plt.gca().invert_yaxis()
+    plt.gca().xaxis.tick_top()
+    plt.xticks(np.arange(Pi.shape[0]+1))
+    plt.yticks(np.arange(Pi.shape[1]+1))
+    plt.grid(True)
+    for x in np.arange(Pi.shape[0]):
+        for y in np.arange(Pi.shape[1]):
+            if Pi[y,x]==0:
+                plt.arrow(x+0.5,y+0.8,0,-0.4,head_width=0.2,head_length=0.2)
+            elif Pi[y,x]==1:
+                plt.arrow(x+0.5,y+0.2,0,0.4,head_width=0.2,head_length=0.2)
+            elif Pi[y,x]==2:
+                plt.arrow(x+0.8,y+0.5,-0.4,0,head_width=0.2,head_length=0.2)
+            elif Pi[y,x]==3:
+                plt.arrow(x+0.2,y+0.5,0.4,0,head_width=0.2,head_length=0.2)
+    plt.show()
+
 ######################
 # Main function
 ######################
@@ -168,8 +210,29 @@ def main():
     w = 0.1
     r = 0.8
     e = 0.01
-    P = init_P(w)
+    ### Q1
     R1, R2 = init_R()
-    compute_pi(P,R2,r,e)
+    plot_map(R1, True)
+    plot_map(R2, True)
+    ### Q2
+    P = init_P(w)
+    V1, Pi_1 = compute_pi(P,R1,r,e)
+    plot_map(V1, False)
+    ### Q3
+    plot_map(V1, True)
+    ### Q4
+    # explain distribution of state values
+    ### Q5
+    plot_action(Pi_1)
+    ### 6
+    V2, Pi_2 = compute_pi(P,R2,r,e)
+    plot_map(V2, False)
+    ### Q7
+    plot_map(V2, True)
+    ### Q8
+    # explain the distribution of state values
+    ### Q9
+    plot_action(Pi_2)
+    ### Q10
 if __name__ == "__main__":
     main()
