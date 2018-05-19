@@ -39,7 +39,7 @@ pi2=cal_optimal_policy(V2,R2,P,Df)
 
 # R = np.zeros((10,10))
 
-def Reward(lamda, Rmax):
+def Reward(lamda, poli, Rmax):
     # c = matrix(np.concatenate((np.zeros(100,), np.ones(100,), np.full((100, ), -lamda))).astype(np.double))
     c = matrix(-np.hstack([np.zeros((100,)), np.ones((100,)), -lamda*np.ones((100,))]))
     Pa1 = np.zeros((100, 100))
@@ -65,21 +65,21 @@ def Reward(lamda, Rmax):
     #This part is from https://github.com/MatthewJA/Inverse-Reinforcement-Learning/blob/master/irl/linear_irl.py
     ##not sure how to write 
     def T(a, s):
-            opti_policy = int(pi1[s%10, s//10])
+            opti_policy = int(poli[s%10, s//10])
             return np.dot(P[opti_policy, s, :] - P[a, s, :], np.linalg.inv(I-0.8*P[opti_policy, s, :]))
 
     Z2 = np.zeros((100*(4-1), 100)) #300*100
     P_long = np.zeros((100*(4-1), 100)) #*100
     count = 0
     for s in range(100):
-    	for a in Actions - {int(pi1[s%10, s//10])}:
+    	for a in Actions - {int(poli[s%10, s//10])}:
     		P_long[count,:] = -T(a,s)
     		count+=1
 
     I2 = np.zeros((100*(4-1), 100)) #*100
     count = 0
     for s in range(100):
-    	for a in Actions - {int(pi1[s%10, s//10])}:
+    	for a in Actions - {int(poli[s%10, s//10])}:
     		I2[count,:] = np.eye(1, 100, s)
     		count+=1
 
@@ -115,11 +115,11 @@ def Reward(lamda, Rmax):
 
     return R_new_10x10
 
-def Acc(R):
+def Acc(R, poli):
     V_inv = cal_state_val(R,P,Df,eps)
     poli_inv = cal_optimal_policy(V_inv, R, P, Df)
     # plot_map(poli_inv, 1)
-    return np.sum(poli_inv == pi1)/100.0
+    return np.sum(poli_inv == poli)/100.0
 
 """
 Q11
@@ -129,7 +129,7 @@ lamdas = np.linspace(0.0, 5.0, num=5, endpoint=True) ## 5 should be changed to 5
 accs = []
 
 for lamda in lamdas:
-    accs.append(Acc(Reward(lamda, rmax)))
+    accs.append(Acc(Reward(lamda, pi1, rmax), pi1))
 
 # print accs
 plt.plot(lamdas, accs)
@@ -147,12 +147,12 @@ Q13
 #ground truth
 plot_map(R1,0)
 #extracted reward
-plot_map(Reward(max_lamda, rmax),0)
+plot_map(Reward(max_lamda, pi1, rmax),0)
 
 """
 Q14
 """
-value=cal_state_val(Reward(max_lamda, rmax),P,Df,eps)
+value=cal_state_val(Reward(max_lamda, pi1, rmax),P,Df,eps)
 plot_map(value,0)
 
 """
@@ -163,10 +163,61 @@ Q15
 """
 Q16
 """
-po=cal_optimal_policy(value, Reward(max_lamda, rmax), P, Df)
+po=cal_optimal_policy(value, Reward(max_lamda, pi1, rmax), P, Df)
 plot_map(po,1)
 
 """
 Q17
 """
 #Compare the figures of Question 5 and Question 16
+
+"""
+Q18
+"""
+rmax = 100
+lamdas = np.linspace(0.0, 5.0, num=10, endpoint=True) ## 5 should be changed to 500
+accs = []
+
+
+for lamda in lamdas:
+    accs.append(Acc(Reward(lamda, pi2, rmax), pi2))
+
+# print accs
+plt.plot(lamdas, accs)
+plt.show()
+
+"""
+Q19
+"""
+max_lamda = lamdas[accs.index(max(accs))]
+print max_lamda
+
+"""
+Q20
+"""
+#ground truth
+plot_map(R2,0)
+#extracted reward
+plot_map(Reward(max_lamda, pi2, rmax),0)
+
+"""
+Q21
+"""
+value=cal_state_val(Reward(max_lamda, pi2, rmax),P,Df,eps)
+plot_map(value,0)
+
+"""
+Q22
+"""
+#Compare the heat maps of Question 7 and Question 21
+
+"""
+Q23
+"""
+po=cal_optimal_policy(value, Reward(max_lamda, pi2, rmax), P, Df)
+plot_map(po,1)
+
+"""
+Q24
+"""
+#Compare the figures of Question 9 and Question 23
