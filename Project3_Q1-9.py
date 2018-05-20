@@ -12,7 +12,9 @@ import numpy as np
 2: left
 3: right
 """
-def plot_map(V,policy):
+
+def plot_map(V,policy,title,filename):
+   
     plt.gca().invert_yaxis()
     plt.gca().xaxis.tick_top()
     plt.xticks(np.arange(0,11,1))
@@ -20,15 +22,19 @@ def plot_map(V,policy):
     if policy == 0:  
         plt.pcolor(V)
         plt.colorbar()  
+    elif policy == 1:
+        plt.grid(True)
         for x in np.arange(0,V.shape[0],1):
             for y in np.arange(0,V.shape[1],1):
-                plt.gca().text(y+0.5,x+0.5,format(V[x, y], '.1f'),horizontalalignment="center")
+               plt.gca().text(y+0.5,x+0.5,format(V[x, y], '.1f'),horizontalalignment="center")
     else:
         plt.grid(True)
         arrow = [u'\u2191', u'\u2193', u'\u2190', u'\u2192']
         for x in np.arange(0,V.shape[0],1):
             for y in np.arange(0,V.shape[1],1):
                 plt.gca().text(y+0.5,x+0.5,arrow[int(V[x,y])])
+    plt.title(str(title),y=1.08)
+    plt.savefig(str(filename)+'.pdf', bbox_inches='tight')
     plt.show()
 
 def cal_state_val(R,P,Df,eps):
@@ -203,19 +209,22 @@ w = 0.1
 P=ini_P_matrix()
 R1, R2 = ini_R_matrix()
 
-plot_map(R1,0)
-plot_map(R2,0)
+plot_map(R1,0,"Q1 Reward function 1 Heatmap","Q1R1")
+plot_map(R2,0,"Q1 Reward function 2 Heatmap","Q1R2")
 
 V1=cal_state_val(R1,P,Df,eps)
 V2=cal_state_val(R2,P,Df,eps)  
 
-plot_map(V1,0)
-plot_map(V2,0)
+plot_map(V1,1,"Q2 Optimal State Value (R1)","Q2")
+plot_map(V1,0,"Q3 Optimal State Value (R1) Heatmap","Q3")
 
 pi1=cal_optimal_policy(V1,R1,P,Df)
+plot_map(pi1,2,"Q5 Optimal policy (R1)","Q5")
+
+
+plot_map(V2,1,"Q6 Optimal State Value (R2)","Q6")
+plot_map(V2,0,"Q7 Optimal State Value (R2) Heatmap","Q7")
+
 pi2=cal_optimal_policy(V2,R2,P,Df)
-
-plot_map(pi1,1)
-plot_map(pi2,1)
-
+plot_map(pi2,2,"Q9 Optimal policy (R2)","Q9")
 
