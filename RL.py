@@ -8,6 +8,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+from cvxopt import matrix, solvers
 ######################
 # Define function
 ######################
@@ -199,6 +200,26 @@ def plot_action(Pi):
             elif Pi[y,x]==3:
                 plt.arrow(x+0.2,y+0.5,0.4,0,head_width=0.2,head_length=0.2)
     plt.show()
+
+def extract_reward(lamda, Pi, Rmax, P):
+    A = set(range(n_actions))
+    def T(a,s):
+        return np.dot(P[Pi[s%10, s/10],s] - P[a,s], np.linalg.inv(np.eye(n_states) - r*P[Pi[s*10, s/10]]))
+
+    c = -np.hstack([np.zeros(n_states), np.ones(n_states),-lamda*np.ones(n_states)])
+    zero_stack1 = np.zeros((n_states*(n_actions-1), n_states))
+    T_stack = np.vstack([-T(a,s) for s in range(n_states) for a in A - {Pi[s%10, s/10]}])
+    I_stack1 = np.vstack([np.eye(1, n_states, s) for s in range(n_states) for a in A - {Pi[s%10, s/10]}])
+    I_stack2 = np.eye(n_states)
+    zero_stack2 = np.zeros((n_states, n_states))
+
+    D_left = np.vstack([T_stack, T_stack, -I_stack2, I_stack2])
+    D_middle = np.vstack([I_stack1, zero_stack1, zero_stack2, zero_stack2])
+    D_right = np.vstack([zero_stack1, zero_stack1, -I_stack2, -I_stack2])
+
+    D = np.hstack([D_left, D_middle, D_right])
+    b = np.zeros((n_states*(n_actions-1)*2 + 2*n_states, 1))
+    bounds = np.array([(None, None)]*2*n_states + [(-Rmax, Rmax)]*n_states)
 
 ######################
 # Main function
