@@ -125,7 +125,7 @@ def Acc(R, poli):
 Q11
 """
 rmax = 1
-lamdas = np.linspace(0.0, 5.0, num=5, endpoint=True) ## 5 should be changed to 500
+lamdas = np.linspace(0.0, 5.0, num=500, endpoint=True) ## 5 should be changed to 500
 accs = []
 
 for lamda in lamdas:
@@ -175,7 +175,7 @@ Q17
 Q18
 """
 rmax = 100
-lamdas = np.linspace(0.0, 5.0, num=10, endpoint=True) ## 5 should be changed to 500
+lamdas = np.linspace(0.0, 5.0, num=500, endpoint=True) ## 5 should be changed to 500
 accs = []
 
 
