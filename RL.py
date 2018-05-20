@@ -201,7 +201,7 @@ def plot_action(Pi):
                 plt.arrow(x+0.2,y+0.5,0.4,0,head_width=0.2,head_length=0.2)
     plt.show()
 
-def extract_reward(lamda, Pi, Rmax, P):
+def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions):
     A = set(range(n_actions))
     def T(a,s):
         return np.dot(P[Pi[s%10, s/10],s] - P[a,s], np.linalg.inv(np.eye(n_states) - r*P[Pi[s*10, s/10]]))
@@ -220,11 +220,23 @@ def extract_reward(lamda, Pi, Rmax, P):
     D = np.hstack([D_left, D_middle, D_right])
     b = np.zeros((n_states*(n_actions-1)*2 + 2*n_states, 1))
     bounds = np.array([(None, None)]*2*n_states + [(-Rmax, Rmax)]*n_states)
+    D_bounds = np.hstack([np.vstack([-np.eye(n_states),np.eye(n_states)]), np.vstack([np.zeros((n_states,n_states)), np.zeros((n_states,n_states))]), np.vstack([np.zeros((n_states,n_states)), np.zeros((n_states,n_states))])])
+    b_bounds = np.vstack([Rmax*np.ones((n_states,1))]*2)
+    D = np.vstack((D,D_bounds))
+    b = np.vstack((b, b_bounds))
+    A_ub = matrix(D)
+    b = matrix(b)
+    c = matrix(c)
+    results = solvers.lp(c, A_ub, b)
+    r = np.asarray(results["x"][:n_states],dtype=np.double)
+    return r.reshape((n_states,))
 
 ######################
 # Main function
 ######################
 def main():
+    n_states=100
+    n_actions=4
     w = 0.1
     r = 0.8
     e = 0.01
