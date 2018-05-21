@@ -12,7 +12,8 @@ import numpy as np
 2: left
 3: right
 """
-def plot_map(V,policy):
+def plot_map(V,policy,title,filename):
+   
     plt.gca().invert_yaxis()
     plt.gca().xaxis.tick_top()
     plt.xticks(np.arange(0,11,1))
@@ -20,15 +21,19 @@ def plot_map(V,policy):
     if policy == 0:  
         plt.pcolor(V)
         plt.colorbar()  
+    elif policy == 1:
+        plt.grid(True)
         for x in np.arange(0,V.shape[0],1):
             for y in np.arange(0,V.shape[1],1):
-                plt.gca().text(y+0.5,x+0.5,format(V[x, y], '.1f'),horizontalalignment="center")
+               plt.gca().text(y+0.5,x+0.5,format(V[x, y], '.1f'),horizontalalignment="center")
     else:
         plt.grid(True)
         arrow = [u'\u2191', u'\u2193', u'\u2190', u'\u2192']
         for x in np.arange(0,V.shape[0],1):
             for y in np.arange(0,V.shape[1],1):
                 plt.gca().text(y+0.5,x+0.5,arrow[int(V[x,y])])
+    plt.title(str(title),y=1.08)
+    plt.savefig(str(filename)+'.pdf', bbox_inches='tight')
     plt.show()
 
 def cal_state_val(R,P,Df,eps):

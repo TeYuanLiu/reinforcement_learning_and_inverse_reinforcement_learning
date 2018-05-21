@@ -147,15 +147,15 @@ print max_lamda
 Q13
 """
 #ground truth
-plot_map(R1,0)
+plot_map(R1,0,"Q13 Ground Truth Reward (R1) Heatmap","Q13_GTR")
 #extracted reward
-plot_map(Reward(max_lamda, pi1, rmax),0)
+plot_map(Reward(max_lamda, pi1, rmax),0,"Q13 Ground Truth Reward (R1) Heatmap","Q13_ER")
 
 """
 Q14
 """
 value=cal_state_val(Reward(max_lamda, pi1, rmax),P,Df,eps)
-plot_map(value,0)
+plot_map(value,0,"Q14 Optimal State Value from Extracted Reward (R1) Heatmap","Q14")
 
 """
 Q15
@@ -166,7 +166,7 @@ Q15
 Q16
 """
 po=cal_optimal_policy(value, Reward(max_lamda, pi1, rmax), P, Df)
-plot_map(po,1)
+plot_map(po,1,"Q16 Optimal Policy from Extracted Reward (R1)","Q16")
 
 """
 Q17
@@ -200,15 +200,15 @@ print max_lamda
 Q20
 """
 #ground truth
-plot_map(R2,0)
+plot_map(R2,0,"Q20 Ground Truth Reward (R2) Heatmap","Q20_GTR")
 #extracted reward
-plot_map(Reward(max_lamda, pi2, rmax),0)
+plot_map(Reward(max_lamda, pi2, rmax),0,"Q20 Ground Truth Reward (R2) Heatmap","Q20_ER")
 
 """
 Q21
 """
 value=cal_state_val(Reward(max_lamda, pi2, rmax),P,Df,eps)
-plot_map(value,0)
+plot_map(value,0,"Q21 Optimal State Value from Extracted Reward (R2) Heatmap","Q21")
 
 """
 Q22
@@ -219,7 +219,7 @@ Q22
 Q23
 """
 po=cal_optimal_policy(value, Reward(max_lamda, pi2, rmax), P, Df)
-plot_map(po,1)
+plot_map(po,1,"Q23 Optimal Policy from Extracted Reward (R2)","Q23")
 
 """
 Q24
