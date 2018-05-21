@@ -253,20 +253,21 @@ def main():
     e = 0.01
     ### Q1
     R1, R2 = init_R()
-    #plot_map(R1, True)
-    #plot_map(R2, True)
+    plot_map(R1, True)
+    plot_map(R2, True)
     
     ### Q2
     P = init_P(w)
     V1, Pi_1 = compute_pi(P,R1,r,e)
-    #plot_map(V1, False)
+    plot_map(V1, False)
     ### Q3
-    #plot_map(V1, True)
+    plot_map(V1, True)
     ### Q4
     # explain distribution of state values
     ### Q5
-    #plot_action(Pi_1)
-    ### 6
+    plot_action(Pi_1)
+    """
+    ### Q6
     V2, Pi_2 = compute_pi(P,R2,r,e)
     plot_map(V2, False)
     ### Q7
@@ -276,8 +277,35 @@ def main():
     ### Q9
     plot_action(Pi_2)
     ### Q10
-    
-    
+
+    ### Q11
+    """
+    ### Q12
+    Rmax_1 = 1
+    lamdas = np.linspace(0.0, 5.0, num=500, endpoint=True)
+    accs = []
+    for lamda in lamdas:
+        accs.append(compute_acc(P,extract_reward(lamda, Pi_1, Rmax_1, P, n_states, n_actions, r),r,e,Pi_1))
+    plot_acc(lamdas, accs)
+
+    ### Q13
+    best_lamda = lamdas[accs.index(max(accs))]
+    print("best lamda: ", best_lamda, " with acc: ", max(accs))
+
+    ### Q14
+    R_inv_best = extract_reward(best_lamda, Pi_1, Rmax_1, P, n_states, n_actions, r)
+    plot_map(R1, 1)
+    plot_map(R_inv_best, 1)
+
+    ### Q15
+    V_inv_best, Pi_inv_best = compute_pi(P, R_inv_best, r, e)
+    plot_map(V_inv_best, 1)
+
+    ### Q16
+
+    ### Q17
+    plot_action(Pi_inv_best)   
+    """
     ### Q18 
     Rmax_2 = 100
     lamdas = np.linspace(0.0, 5.0, num=500, endpoint=True)
@@ -306,5 +334,6 @@ def main():
     ### Q24
     
     ### Q25
+    """
 if __name__ == "__main__":
     main()
