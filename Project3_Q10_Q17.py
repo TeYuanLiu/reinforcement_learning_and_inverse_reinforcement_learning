@@ -133,6 +133,8 @@ for lamda in lamdas:
 
 # print accs
 plt.plot(lamdas, accs)
+plt.xlabel('$\lambda$')
+plt.ylabel('Accuracy')
 plt.show()
 
 """
@@ -184,6 +186,8 @@ for lamda in lamdas:
 
 # print accs
 plt.plot(lamdas, accs)
+plt.xlabel('$\lambda$')
+plt.ylabel('Accuracy')
 plt.show()
 
 """
