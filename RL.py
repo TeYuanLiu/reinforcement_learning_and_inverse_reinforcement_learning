@@ -201,15 +201,15 @@ def plot_action(Pi):
                 plt.arrow(x+0.2,y+0.5,0.4,0,head_width=0.2,head_length=0.2)
     plt.show()
 
-def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions):
+def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions, r):
     A = set(range(n_actions))
     def T(a,s):
-        return np.dot(P[Pi[s%10, s/10],s] - P[a,s], np.linalg.inv(np.eye(n_states) - r*P[Pi[s*10, s/10]]))
+        return np.dot(P[int(Pi[s%10, s//10]),s] - P[a,s], np.linalg.inv(np.eye(n_states) - r*P[int(Pi[s%10, s//10])]))
 
     c = -np.hstack([np.zeros(n_states), np.ones(n_states),-lamda*np.ones(n_states)])
     zero_stack1 = np.zeros((n_states*(n_actions-1), n_states))
-    T_stack = np.vstack([-T(a,s) for s in range(n_states) for a in A - {Pi[s%10, s/10]}])
-    I_stack1 = np.vstack([np.eye(1, n_states, s) for s in range(n_states) for a in A - {Pi[s%10, s/10]}])
+    T_stack = np.vstack([-T(a,s) for s in range(n_states) for a in A - {int(Pi[s%10, s//10])}])
+    I_stack1 = np.vstack([np.eye(1, n_states, s) for s in range(n_states) for a in A - {int(Pi[s%10, s//10])}])
     I_stack2 = np.eye(n_states)
     zero_stack2 = np.zeros((n_states, n_states))
 
@@ -219,41 +219,53 @@ def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions):
 
     D = np.hstack([D_left, D_middle, D_right])
     b = np.zeros((n_states*(n_actions-1)*2 + 2*n_states, 1))
-    bounds = np.array([(None, None)]*2*n_states + [(-Rmax, Rmax)]*n_states)
+    #bounds = np.array([(None, None)]*2*n_states + [(-Rmax, Rmax)]*n_states)
     D_bounds = np.hstack([np.vstack([-np.eye(n_states),np.eye(n_states)]), np.vstack([np.zeros((n_states,n_states)), np.zeros((n_states,n_states))]), np.vstack([np.zeros((n_states,n_states)), np.zeros((n_states,n_states))])])
     b_bounds = np.vstack([Rmax*np.ones((n_states,1))]*2)
-    D = np.vstack((D,D_bounds))
+    D = np.vstack((D, D_bounds))
     b = np.vstack((b, b_bounds))
     A_ub = matrix(D)
     b = matrix(b)
     c = matrix(c)
     results = solvers.lp(c, A_ub, b)
     r = np.asarray(results["x"][:n_states],dtype=np.double)
-    return r.reshape((n_states,))
+    #print(r)
+    return np.transpose(r.reshape((10,10)))
 
+def compute_acc(P,R,r,e,Pi_opt):
+    V, Pi = compute_pi(P,R,r,e)
+    return np.sum(Pi == Pi_opt)/100.0
+
+def plot_acc(lamdas, accs):
+    plt.figure()
+    plt.plot(lamdas, accs)
+    plt.xlabel("lamda")
+    plt.ylabel("Accuracy")
+    plt.show()
 ######################
 # Main function
 ######################
 def main():
-    n_states=100
-    n_actions=4
+    n_states = 100
+    n_actions = 4
     w = 0.1
     r = 0.8
     e = 0.01
     ### Q1
     R1, R2 = init_R()
-    plot_map(R1, True)
-    plot_map(R2, True)
+    #plot_map(R1, True)
+    #plot_map(R2, True)
+    
     ### Q2
     P = init_P(w)
     V1, Pi_1 = compute_pi(P,R1,r,e)
-    plot_map(V1, False)
+    #plot_map(V1, False)
     ### Q3
-    plot_map(V1, True)
+    #plot_map(V1, True)
     ### Q4
     # explain distribution of state values
     ### Q5
-    plot_action(Pi_1)
+    #plot_action(Pi_1)
     ### 6
     V2, Pi_2 = compute_pi(P,R2,r,e)
     plot_map(V2, False)
@@ -264,5 +276,35 @@ def main():
     ### Q9
     plot_action(Pi_2)
     ### Q10
+    
+    
+    ### Q18 
+    Rmax_2 = 100
+    lamdas = np.linspace(0.0, 5.0, num=500, endpoint=True)
+    accs = []
+    for lamda in lamdas:
+        accs.append(compute_acc(P,extract_reward(lamda, Pi_2, Rmax_2, P, n_states, n_actions, r),r,e,Pi_2))
+    plot_acc(lamdas, accs)
+
+    ### Q19
+    best_lamda = lamdas[accs.index(max(accs))]
+    print("best lamda: ", best_lamda, " with acc: ", max(accs))
+
+    ### Q20
+    R_inv_best = extract_reward(best_lamda, Pi_2, Rmax_2, P, n_states, n_actions, r)
+    plot_map(R2, 1)
+    plot_map(R_inv_best, 1)
+
+    ### Q21
+    V_inv_best, Pi_inv_best = compute_pi(P, R_inv_best, r, e)
+    plot_map(V_inv_best, 1)
+
+    ### Q22
+
+    ### Q23
+    plot_action(Pi_inv_best)
+    ### Q24
+    
+    ### Q25
 if __name__ == "__main__":
     main()
