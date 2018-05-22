@@ -228,9 +228,9 @@ def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions, r):
     b = matrix(b)
     c = matrix(c)
     results = solvers.lp(c, A_ub, b)
-    r = np.asarray(results["x"][:n_states],dtype=np.double)
+    R = np.asarray(results["x"][:n_states],dtype=np.double)
     #print(r)
-    return np.transpose(r.reshape((10,10)))
+    return np.transpose(R.reshape((10,10)))
 
 def compute_acc(P,R,r,e,Pi_opt):
     V, Pi = compute_pi(P,R,r,e)
