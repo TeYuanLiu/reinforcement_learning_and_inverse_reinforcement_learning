@@ -206,7 +206,7 @@ def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions, r):
     def T(a,s):
         return np.dot(P[int(Pi[s%10, s//10]),s] - P[a,s], np.linalg.inv(np.eye(n_states) - r*P[int(Pi[s%10, s//10])]))
 
-    c = -np.hstack([np.zeros(n_states), np.ones(n_states), -lamda*np.ones(n_states), np.zeros(n_states)])
+    c = -np.hstack([np.zeros(n_states), np.ones(n_states), -lamda*np.ones(n_states)])
     zero_stack1 = np.zeros((n_states*(n_actions-1), n_states))
     T_stack = np.vstack([-T(a,s) for s in range(n_states) for a in A - {int(Pi[s%10, s//10])}])
     I_stack1 = np.vstack([np.eye(1, n_states, s) for s in range(n_states) for a in A - {int(Pi[s%10, s//10])}])
@@ -216,19 +216,19 @@ def extract_reward(lamda, Pi, Rmax, P, n_states, n_actions, r):
     D_left = np.vstack([T_stack, T_stack, -I_stack2, I_stack2, -I_stack2, I_stack2])
     D_middle = np.vstack([I_stack1, zero_stack1, zero_stack2, zero_stack2, zero_stack2, zero_stack2])
     D_right = np.vstack([zero_stack1, zero_stack1, -I_stack2, -I_stack2, zero_stack2, zero_stack2])
-    D_rightmost = np.vstack([zero_stack1, zero_stack1, zero_stack2, zero_stack2, -I_stack2, -I_stack2])
+    #D_rightmost = np.vstack([zero_stack1, zero_stack1, zero_stack2, zero_stack2, -I_stack2, -I_stack2])
 
-    D = np.hstack([D_left, D_middle, D_right, D_rightmost])
-    zero = np.zeros((n_states*(n_actions-1)*2 + 4*n_states, 1))
+    D = np.hstack([D_left, D_middle, D_right])
+    b = np.zeros((n_states*(n_actions-1)*2 + 2*n_states, 1))
     #bounds = np.array([(None, None)]*2*n_states + [(-Rmax, Rmax)]*n_states)
     #D_bounds = np.hstack([np.vstack([-np.eye(n_states),np.eye(n_states)]), np.vstack([np.zeros((n_states,n_states)), np.zeros((n_states,n_states))]), np.vstack([np.zeros((n_states,n_states)), np.zeros((n_states,n_states))])])
-    #b_bounds = np.vstack([Rmax*np.ones((n_states,1))]*2)
+    b_bounds = np.vstack([Rmax*np.ones((n_states,1))]*2)
     #D = np.vstack((D, D_bounds))
-    #b = np.vstack((b, b_bounds))
+    b = np.vstack((b, b_bounds))
     D = matrix(D)
-    zero = matrix(zero)
+    b = matrix(b)
     c = matrix(c)
-    results = solvers.lp(c, D, zero)
+    results = solvers.lp(c, D, b)
     R = np.asarray(results["x"][:n_states],dtype=np.double)
     return np.transpose(R.reshape((10,10)))
 
@@ -250,7 +250,7 @@ def main():
     n_actions = 4
     w = 0.1
     r = 0.8
-    r_new = 0.2
+    r_new = 0.8
     e = 0.01
     ### Q1
     R1, R2 = init_R()
@@ -315,7 +315,8 @@ def main():
     lamdas = np.linspace(0.0, 5.0, num=500, endpoint=True)
     accs = []
     for lamda in lamdas:
-        accs.append(compute_acc(P,extract_reward(lamda, Pi_2, Rmax_2, P, n_states, n_actions, r_new),r_new,e,Pi_2))
+        R_inv = extract_reward(lamda, Pi_2, Rmax_2, P, n_states, n_actions, r_new)
+        accs.append(compute_acc(P, R_inv, r_new, np.amax(R_inv)*0.01, Pi_2))
     plot_acc(lamdas, accs)
 
     ### Q19
@@ -328,7 +329,7 @@ def main():
     plot_map(R_inv_best, 1)
 
     ### Q21
-    V_inv_best, Pi_inv_best = compute_pi(P, R_inv_best, r_new, e)
+    V_inv_best, Pi_inv_best = compute_pi(P, R_inv_best, r_new, np.amax(R_inv)*0.01)
     plot_map(V_inv_best, 1)
 
     ### Q22
